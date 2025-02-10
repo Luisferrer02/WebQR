@@ -1,8 +1,8 @@
+//Arreglar variables de entorno y poner las correctas sobre el despliegue y el mongo tambien. Localhost, puertos, mongoatlas, etc. Nuevo cluster. Diseño de app, pantallas de carga y confirmacion y etc, que no pase como en el de restaurantes que se pasa un rato cargando
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
 const mongoose = require("mongoose");
-//Arreglar variables de entorno y poner las correctas sobre el despliegue y el mongo tambien. Localhost, puertos, mongoatlas, etc. Nuevo cluster. Diseño de app, pantallas de carga y confirmacion y etc, que no pase como en el de restaurantes que se pasa un rato cargando
+const cors = require("cors");
 
 const app = express();
 
