@@ -16,7 +16,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-700">
       <h1 className="text-3xl font-bold mb-4">Generador de Códigos QR</h1>
       <input
         type="text"
