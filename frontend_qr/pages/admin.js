@@ -21,11 +21,11 @@ export default function Admin() {
       <input
         type="text"
         placeholder="Nombre del QR (ej: baño)"
-        className="border p-2 rounded mb-4"
+        className="border p-2 rounded mb-4 text-gray-900"
         value={qrId}
         onChange={(e) => setQrId(e.target.value)}
       />
-      <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={generateQR}>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={generateQR}>
         Generar QR
       </button>
 
