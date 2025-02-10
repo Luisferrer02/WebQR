@@ -7,8 +7,9 @@ const Token = require("../models/Token");
 const router = express.Router();
 
 // 🔹 Escaneo de QR
+// 🔹 Escaneo de QR
 router.post("/scan", async (req, res) => {
-  const { id: qrId, dispositivoId } = req.body;
+  const { id: qrId, dispositivoId, nombre, apellido } = req.body;
 
   if (!dispositivoId) {
     return res.status(400).json({ message: "Dispositivo no identificado" });
@@ -16,8 +17,21 @@ router.post("/scan", async (req, res) => {
 
   // Buscar usuario por dispositivoId
   let usuario = await User.findOne({ dispositivoId });
+
   if (!usuario) {
-    usuario = await User.create({ dispositivoId, qr_escaneados: [], puntos: 0 });
+    usuario = await User.create({ dispositivoId, nombre, apellido, qr_escaneados: [], puntos: 0 });
+    return res.json({ 
+      message: `¡Bienvenido! ${nombre ? nombre : "Jugador"} 🎉\nDurante el "Innovation Day" estarán dispersos códigos QR. La universidad realizará un sorteo entre quienes más puntos acumulen.`,
+      puntos: usuario.puntos,
+      solicitarNombre: !nombre || !apellido
+    });
+  }
+
+  // Si el usuario ya existe pero no tiene nombre, guardarlo
+  if ((!usuario.nombre || !usuario.apellido) && nombre && apellido) {
+    usuario.nombre = nombre;
+    usuario.apellido = apellido;
+    await usuario.save();
   }
 
   // Verificar si este QR ya ha sido escaneado por este usuario
@@ -30,7 +44,34 @@ router.post("/scan", async (req, res) => {
   usuario.puntos += 1;
   await usuario.save();
 
-  res.json({ message: `¡Enhorabuena! Has escaneado el QR: ${qrId}`, puntos: usuario.puntos });
+  res.json({ 
+    message: `¡Has escaneado el QR: ${qrId}!`,
+    puntos: usuario.puntos,
+    solicitarNombre: !usuario.nombre || !usuario.apellido
+  });
+});
+
+router.get("/leaderboard", async (req, res) => {
+  try {
+    // Obtener todos los usuarios ordenados por puntos de mayor a menor
+    const usuariosOrdenados = await User.find({ nombre: { $ne: null } })
+      .sort({ puntos: -1 });
+
+    if (usuariosOrdenados.length === 0) {
+      return res.json([]);
+    }
+
+    // Obtener el puntaje más alto registrado
+    const maxPuntos = usuariosOrdenados[0].puntos;
+
+    // Filtrar todos los usuarios que tengan puntajes hasta la cantidad máxima
+    const leaderboard = usuariosOrdenados.filter(user => user.puntos >= maxPuntos);
+
+    res.json(leaderboard);
+  } catch (error) {
+    console.error("Error obteniendo el leaderboard:", error);
+    res.status(500).json({ error: "Error obteniendo el leaderboard" });
+  }
 });
 
 
