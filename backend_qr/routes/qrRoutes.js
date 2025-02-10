@@ -6,6 +6,34 @@ const Token = require("../models/Token");
 
 const router = express.Router();
 
+// 🔹 Escaneo de QR
+router.post("/scan", async (req, res) => {
+  const { id: qrId, dispositivoId } = req.body;
+
+  if (!dispositivoId) {
+    return res.status(400).json({ message: "Dispositivo no identificado" });
+  }
+
+  // Buscar usuario por dispositivoId
+  let usuario = await User.findOne({ dispositivoId });
+  if (!usuario) {
+    usuario = await User.create({ dispositivoId, qr_escaneados: [], puntos: 0 });
+  }
+
+  // Verificar si este QR ya ha sido escaneado por este usuario
+  if (usuario.qr_escaneados.includes(qrId)) {
+    return res.json({ message: "¡Este QR ya lo has escaneado!", puntos: usuario.puntos });
+  }
+
+  // Agregar el QR a la lista de escaneados y sumar puntos
+  usuario.qr_escaneados.push(qrId);
+  usuario.puntos += 1;
+  await usuario.save();
+
+  res.json({ message: `¡Enhorabuena! Has escaneado el QR: ${qrId}`, puntos: usuario.puntos });
+});
+
+
 // 🔹 GET: Estado del servidor
 router.get("/", (req, res) => {
   res.json({ message: "Servidor Backend QR funcionando correctamente 🚀" });
@@ -57,33 +85,5 @@ router.post("/generate-qr", async (req, res) => {
   });
 });
 
-// 🔹 POST: Escaneo de QR
-router.post("/scan", async (req, res) => {
-  const { id: qrId, token, dispositivoId } = req.body;
-
-  // Validar token
-  const tokenData = await Token.findOne({ qrId, token, usado: false });
-  if (!tokenData) return res.status(400).json({ message: "Token inválido o ya usado. Ya has escaneado este qr." });
-
-  // Buscar usuario
-  let usuario = await User.findOne({ dispositivoId });
-  if (!usuario) {
-    usuario = await User.create({ dispositivoId, qr_escaneados: [], puntos: 0 });
-  }
-
-  // Verificar si ya escaneó este QR
-  if (usuario.qr_escaneados.includes(qrId)) {
-    return res.json({ message: "¡Este ya lo has escaneado!", puntos: usuario.puntos });
-  }
-
-  usuario.qr_escaneados.push(qrId);
-  usuario.puntos += 1;
-  await usuario.save();
-
-  tokenData.usado = true;
-  await tokenData.save();
-
-  res.json({ message: `¡Enhorabuena! Has escaneado el QR: ${qrId}`, puntos: usuario.puntos });
-});
 
 module.exports = router;

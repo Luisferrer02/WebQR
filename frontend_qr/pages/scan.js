@@ -4,11 +4,11 @@ import axios from "axios";
 
 export default function Scan() {
   const router = useRouter();
-  const { id, token } = router.query;
+  const { id } = router.query;
   const [mensaje, setMensaje] = useState("Verificando...");
 
   useEffect(() => {
-    if (id && token) {
+    if (id) {
       let dispositivoId = localStorage.getItem("dispositivoId");
       if (!dispositivoId) {
         dispositivoId = Math.random().toString(36).substr(2, 9);
@@ -18,13 +18,12 @@ export default function Scan() {
       axios
         .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scan`, {
           id,
-          token,
           dispositivoId
         })
         .then((res) => setMensaje(res.data.message + ` - Llevas ${res.data.puntos} puntos`))
         .catch(() => setMensaje("Error al procesar el escaneo."));
     }
-  }, [id, token]);
+  }, [id]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-green-100 p-6">
