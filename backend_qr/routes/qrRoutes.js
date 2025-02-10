@@ -63,7 +63,7 @@ router.post("/scan", async (req, res) => {
 
   // Validar token
   const tokenData = await Token.findOne({ qrId, token, usado: false });
-  if (!tokenData) return res.status(400).json({ message: "Token inválido o ya usado" });
+  if (!tokenData) return res.status(400).json({ message: "Token inválido o ya usado. Ya has escaneado este qr." });
 
   // Buscar usuario
   let usuario = await User.findOne({ dispositivoId });

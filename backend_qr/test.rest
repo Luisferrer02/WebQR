@@ -1,17 +1,17 @@
 ### 🔹 Verificar que el backend está corriendo
-GET http://localhost:3000/api/
+GET https://webqr-f836.onrender.com/api/
 
 ### 🔹 Obtener todos los usuarios
-GET http://localhost:3000/api/users
+GET https://webqr-f836.onrender.com/api/users
 
 ### 🔹 Obtener un usuario por dispositivoId
-GET http://localhost:3000/api/user/dispositivo123
+GET https://webqr-f836.onrender.com/api/user/dispositivo123
 
 ### 🔹 Obtener todos los tokens generados
-GET http://localhost:3000/api/tokens
+GET https://webqr-f836.onrender.com/api/tokens
 
 ### 🔹 Generar un nuevo QR
-POST http://localhost:3000/api/generate-qr
+POST https://webqr-f836.onrender.com/api/generate-qr
 Content-Type: application/json
 
 {
@@ -19,11 +19,11 @@ Content-Type: application/json
 }
 
 ### 🔹 Escanear un QR (Simular escaneo desde un dispositivo)
-POST http://localhost:3000/api/scan
+POST https://webqr-f836.onrender.com/api/scan
 Content-Type: application/json
 
 {
   "id": "baño",
-  "token": "PONER_AQUI_TOKEN_GENERADO",
+  "token": "5e9069e0a23d87a0b89ad929b39f4a5d",
   "dispositivoId": "dispositivo123"
 }
