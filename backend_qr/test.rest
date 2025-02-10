@@ -1,0 +1,29 @@
+### 🔹 Verificar que el backend está corriendo
+GET http://localhost:3000/api/
+
+### 🔹 Obtener todos los usuarios
+GET http://localhost:3000/api/users
+
+### 🔹 Obtener un usuario por dispositivoId
+GET http://localhost:3000/api/user/dispositivo123
+
+### 🔹 Obtener todos los tokens generados
+GET http://localhost:3000/api/tokens
+
+### 🔹 Generar un nuevo QR
+POST http://localhost:3000/api/generate-qr
+Content-Type: application/json
+
+{
+  "qrId": "baño"
+}
+
+### 🔹 Escanear un QR (Simular escaneo desde un dispositivo)
+POST http://localhost:3000/api/scan
+Content-Type: application/json
+
+{
+  "id": "baño",
+  "token": "PONER_AQUI_TOKEN_GENERADO",
+  "dispositivoId": "dispositivo123"
+}

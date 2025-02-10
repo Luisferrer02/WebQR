@@ -6,9 +6,45 @@ const Token = require("../models/Token");
 
 const router = express.Router();
 
-// 🔹 Generar QR con token único
-router.get("/generate-qr/:qrId", async (req, res) => {
-  const { qrId } = req.params;
+// 🔹 GET: Estado del servidor
+router.get("/", (req, res) => {
+  res.json({ message: "Servidor Backend QR funcionando correctamente 🚀" });
+});
+
+// 🔹 GET: Obtener todos los usuarios (para testeo)
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Error obteniendo usuarios" });
+  }
+});
+
+// 🔹 GET: Obtener un usuario por dispositivoId
+router.get("/user/:dispositivoId", async (req, res) => {
+  try {
+    const user = await User.findOne({ dispositivoId: req.params.dispositivoId });
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Error obteniendo usuario" });
+  }
+});
+
+// 🔹 GET: Obtener todos los tokens generados
+router.get("/tokens", async (req, res) => {
+  try {
+    const tokens = await Token.find();
+    res.json(tokens);
+  } catch (err) {
+    res.status(500).json({ error: "Error obteniendo tokens" });
+  }
+});
+
+// 🔹 POST: Generar QR con token único
+router.post("/generate-qr", async (req, res) => {
+  const { qrId } = req.body;
   const token = crypto.randomBytes(16).toString("hex");
 
   await Token.create({ qrId, token });
@@ -21,21 +57,9 @@ router.get("/generate-qr/:qrId", async (req, res) => {
   });
 });
 
-// 🔹 Escaneo de QR y validación
+// 🔹 POST: Escaneo de QR
 router.post("/scan", async (req, res) => {
   const { id: qrId, token, dispositivoId } = req.body;
-
-  // Verificar Referer para evitar accesos manuales
-  const referer = req.headers.referer || req.headers.origin;
-  if (!referer || !referer.includes("miapp.com")) {
-    return res.status(400).json({ message: "Acceso inválido, QR no escaneado correctamente" });
-  }
-
-  // Validar User-Agent para asegurarnos de que es un móvil
-  const userAgent = req.headers["user-agent"];
-  if (!userAgent || (!userAgent.includes("Android") && !userAgent.includes("iPhone"))) {
-    return res.status(400).json({ message: "Acceso desde un entorno no permitido" });
-  }
 
   // Validar token
   const tokenData = await Token.findOne({ qrId, token, usado: false });
